@@ -1,0 +1,71 @@
+import os
+
+rule assembly_se:
+    input:
+        targetseqs = "Results/splittaxo/{prefix}-se.taxo.{group}.fasta"
+        
+    output:
+        assembly = "Results/assembly/{prefix}-se.{group}-contigs.fasta",
+        unassembled = "Results/assembly/{prefix}-se.{group}-unassembled_reads.fasta",
+
+    params:
+        renamed=lambda wildcards,output: output.assembly.replace('.taxo', ''),
+        unassembled_reads=lambda wildcards,output: output.assembly.replace('contigs', 'unassembled_reads'),
+        base=lambda wildcards,output: output.assembly.replace('-contigs.fasta', ''),
+        tool="perl /pasteur/projets/specific/PGP_Work/Scripts/clc5_denovo_slurm2.pl"
+
+    log:
+        "Results/assembly/{prefix}-{group}-se.log"
+    
+    shell:
+         """
+         set +eou pipefail;
+         module load clc-assembly-cell/5.0.0
+         if ([ -s {input.targetseqs} ] and [ `grep -c "^>" {input.targetseqs}` -ge 100 ]); then 
+              clc_assembler -q {input.targetseqs} -o {output.assembly} ; 
+              if [[ -s {output.assembly} ]]; then
+                  clc_mapper_legacy -o {params.base}_assembly.cas -q {input.targetseqs} -d {output.assembly} --cpus 2
+                  clc_unmapped_reads -a {params.base}_assembly.cas -o {params.unassembled_reads}
+              else
+                  cp {input.targetseqs} {params.unassembled_reads};
+             fi
+         else 
+             touch {output.assembly} {params.unassembled_reads}; 
+         fi;
+         """
+
+
+rule assembly_pe:
+    input:
+        targetseqs = "Results/splittaxo/{prefix}-pe.taxo.{group}.fasta"
+        
+    output:
+        assembly ="Results/assembly/{prefix}-pe.{group}-contigs.fasta",
+        unassembled = "Results/assembly/{prefix}-pe.{group}-unassembled_reads.fasta",
+
+    params:
+        renamed=lambda wildcards,output: output.assembly.replace('.taxo', ''),
+        unassembled_reads=lambda wildcards,output: output.assembly.replace('contigs', 'unassembled_reads'),
+        base=lambda wildcards,output: output.assembly.replace('-contigs.fasta', ''),
+        tool="perl /pasteur/projets/specific/PGP_Work/Scripts/clc5_denovo_slurm2.pl"
+
+    log:
+        "Results/assembly/{prefix}-{group}-pe.log"
+    
+    shell:
+         """
+         set +eou pipefail;
+         module load clc-assembly-cell/5.0.0
+         if [[ -s {input.targetseqs} ]]; then 
+              clc_assembler -q {input.targetseqs} -o {output.assembly} 
+              if [[ -s {output.assembly} ]]; then
+              clc_mapper_legacy -o {params.base}_assembly.cas -q {input.targetseqs} -d {output.assembly} --cpus 2
+              clc_unmapped_reads -a {params.base}_assembly.cas -o {params.unassembled_reads}
+              else
+              cp {input.targetseqs} {params.unassembled_reads};
+             fi
+         else 
+              touch {output.assembly} {params.unassembled_reads}; 
+         fi;
+         """
+

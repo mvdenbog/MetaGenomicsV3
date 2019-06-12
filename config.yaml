@@ -1,0 +1,65 @@
+resources: "resources_SLURM.yaml"
+
+reference_genome: "Ref/genome.chr21.fa"
+
+reads: "input_data.csv"
+
+Fastqc: 
+  prelude: "module load fastqc"
+  tool: "fastqc"
+
+deconseq:
+  tool: "sh /pasteur/projets/specific/PGP_Work/Scripts/DeconSeq/pgpDeconseq_slurm.sh"
+
+bwa: "bwa"
+
+samtools: "samtools"
+
+bam2fastq: "/pasteur/projets/specific/PGP_Work/Scripts/bam2fastq-1.1.0/bam2fastq"
+
+fastq2fasta: "perl /pasteur/projets/specific/PGP_Work/Scripts/fastq2fasta.pl"
+
+kraken2_se:
+   tool: "/pasteur/projets/specific/PGP_Work/Scripts/Kraken2/BUILD/kraken2"
+   DB: "/pasteur/projets/specific/PGP_Work/Scripts/Kraken2/DB/"
+
+kraken2_pe:
+   tool: "/pasteur/projets/specific/PGP_Work/Scripts/Kraken2/BUILD/kraken2"
+   DB: "/pasteur/projets/specific/PGP_Work/Scripts/Kraken2/DB/"
+
+kraken2:
+   tool: "/pasteur/projets/specific/PGP_Work/Scripts/Kraken2/BUILD/kraken2"
+   DB: "/pasteur/projets/specific/PGP_Work/Scripts/Kraken2/DB/"
+
+
+software:
+  seqtk: seqtk
+  snakemake_folder: ./
+
+assemblers:
+- megahit
+- metaspades
+env: source activate pipeline-metageno-3.0
+params:
+  atropos: ' -a GATCGGAAGAGCACACGTCTGAACTCCAGTCAC -A GATCGGAAGAGCGTCGTGTAGGGAAAGGAGTGT
+    -q 15 --minimum-length 100 --pair-filter any'
+  cram: ''
+  kraken:
+    kraken_db: /home/qiz173/Databases/Kraken/stdb
+  maxbin: -plotmarker
+  skewer: -x ./adapters/HyperPlus.fa -n -l 100 -m any -q 15
+
+filter_db: /pasteur/scratch/mathias/Bowtie2
+tmp_dir_root: /pasteur/scratch
+trimmer: atropos
+
+fqcleaner: 
+   tool: "sh /pasteur/projets/specific/PGP_Work/Scripts/fqCleaner-slurm.sh "
+   q: 28
+   l: 30
+   p: 70
+
+blast:
+   BEV: "10e-3"
+   NTDB: "/pasteur/services/policy01/banques/prod/rel/nt/current/blast2/2.2.26/nt"
+   UNIPROTDB: "/pasteur/services/policy01/banques/prod/rel/uniprot/current/blast2/2.2.26/uniprot"

@@ -1,0 +1,47 @@
+import os
+
+
+UNIT_TO_SAMPLE_PE = {
+    ID: sample for sample, units in PE_samples.items()
+    for ID in units}
+
+UNIT_TO_SAMPLE_SE = {
+    ID: sample for sample, units in SE_samples.items()
+    for ID in units}
+
+
+rule fqcleaner_se:
+    input:
+        reads="{unit}.fastq"
+    output:
+        "Results/fqcleaner/{unit}.q{q}p{p}l{l}.fq",         
+    params:
+        q=config["fqcleaner"]["q"], 
+        p=config["fqcleaner"]["p"], 
+        l=config["fqcleaner"]["l"],
+        tool=config["fqcleaner"]["tool"],
+        ID=lambda wildcards: UNIT_TO_SAMPLE_SE[wildcards.unit]
+
+    run:
+        shell("{params.tool} -f  {input.reads} -q {params.q} -l {params.l} -p {params.p} -x {output} ; mv `basename {input} .fastq`.log.txt Results/fqcleaner/")
+
+rule fqcleaner_pe:
+    input:
+         forward = "{unit}.R1.fastq",
+         reverse = "{unit}.R2.fastq"
+    output:
+         forward = "Results/fqcleaner/{unit}.q{q}p{p}l{l}_1.fq",
+         reverse = "Results/fqcleaner/{unit}.q{q}p{p}l{l}_2.fq",
+         sgl = "Results/fqcleaner/{unit}.q{q}p{p}l{l}_sgl.fq"
+
+    params:
+        q=config["fqcleaner"]["q"], 
+        p=config["fqcleaner"]["p"], 
+        l=config["fqcleaner"]["l"],
+        tool=config["fqcleaner"]["tool"],
+        ID=lambda wildcards: UNIT_TO_SAMPLE_PE[wildcards.unit]
+
+    run:
+        shell("{params.tool} -f  {input.forward} -r {input.reverse} -q {params.q} -l {params.l} -p {params.p} -x {output.forward} -y {output.reverse} -z {output.sgl}; mv `basename {input.forward} .fastq`.log.txt Results/fqcleaner/ ")
+
+

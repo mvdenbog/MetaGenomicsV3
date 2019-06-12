@@ -1,0 +1,53 @@
+import os
+
+GROUPS=["Virus","Bacteria","Eukaryota","Fungi","Other","Unclassifieds"]
+
+rule splittaxo_se:
+    input:
+        "Results/kraken2taxo/{prefix}-se.taxo"
+        
+    output:
+        taxo="Results/splittaxo/{prefix}-se.taxo.{group}.fasta"
+
+    params:
+        DB="/pasteur/gaia/projets/p01/PGP_Work/Scripts/PgpSlurmBlast2Taxo/taxonomy.db",
+        renamed=lambda wildcards,output: output.taxo.replace('.{group}.fasta', ''),
+        tool="splittaxo.sh",
+        ref_fasta="Results/deconseq/{prefix}-se_clean.fasta",
+
+    log:
+        "Results/splittaxo/{prefix}-{group}-se.log"
+ 
+    shell:
+        """
+        sh splittaxo.sh {params.ref_fasta} {input} {wildcards.group}
+        mv `basename {params.renamed} .fasta`.{{list,fasta}} Results/splittaxo/
+        ls -l {output.taxo}
+        if [[ ! -s {output.taxo} ]]; then exit 0; fi;
+        """
+   
+rule splittaxo_pe:
+    input:
+        "Results/kraken2taxo/{prefix}-pe.taxo"
+        
+    output:
+        taxo="Results/splittaxo/{prefix}-pe.taxo.{group}.fasta"
+
+    params:
+        DB="/pasteur/gaia/projets/p01/PGP_Work/Scripts/PgpSlurmBlast2Taxo/taxonomy.db",
+        renamed=lambda wildcards,output: output.taxo.replace('.fasta', ''),
+        tool="splittaxo.sh",
+        ref_fasta="Results/deconseq/{prefix}-pe_clean.fasta",
+
+    log:
+        "Results/splittaxo/{prefix}-{group}-pe.log"
+    
+    shell:
+        """
+        sh splittaxo.sh {params.ref_fasta} {input} {wildcards.group}
+        echo  mv `basename {params.renamed}`.{{list,fasta}} Results/splittaxo/
+        mv `basename {params.renamed} .fasta`.{{list,fasta}} Results/splittaxo/
+        ls -l {output.taxo}
+        if [[ ! -s {output.taxo} ]]; then exit 0; fi;
+        """
+

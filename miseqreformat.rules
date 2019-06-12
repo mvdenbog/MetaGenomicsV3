@@ -1,0 +1,28 @@
+import os
+
+
+rule miseqreformat_se:
+    input:
+        "Results/concat/SE/{prefix}.fq"
+        
+    output:
+        renamed = "Results/reformat/{prefix}-se.fq"
+       
+    shell:
+        """
+        perl /pasteur/projets/specific/PGP_Work/Scripts/miseq_reformat_fq.pl {input} {output.renamed}
+        """
+
+
+rule miseqreformat_pe:
+    input:
+        "Results/concat/PE/{prefix}.fq"
+        
+    output:
+        renamed = "Results/reformat/{prefix}-pe.fq"
+       
+    shell:
+        """
+        perl /pasteur/projets/specific/PGP_Work/Scripts/miseq_reformat_fq.pl {input} {output.renamed}
+        """
+

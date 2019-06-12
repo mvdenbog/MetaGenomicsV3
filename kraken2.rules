@@ -1,0 +1,46 @@
+import os
+
+
+rule kraken2_se:
+    input:
+        reads = "Results/deconseq/{prefix}-se_clean.fasta"
+        
+    output:
+        kraken2 = "Results/kraken2/{prefix}-se",
+        classifieds = "Results/kraken2/{prefix}-se.fasta",
+
+    params:
+        DB="/pasteur/projets/specific/PGP_Work/Scripts/Kraken2/DB/",
+        renamed=lambda wildcards,output: output.classifieds.replace('.fasta', ''),
+        tool="/pasteur/projets/specific/PGP_Work/Scripts/Kraken2/BUILD/kraken2"
+
+    threads: config["kraken2_se"]["cpu"]
+        
+    log:
+        "Results/kraken2/{prefix}-se.log"
+    
+    run:
+         shell("time {params.tool} --threads {threads} -db {params.DB} --unclassified-out {params.renamed}.unclassified --classified-out {output.classifieds} --output {output.kraken2} --report {params.renamed}.report  --report-zero-counts {input.reads} &> {log} ")
+
+
+rule kraken2_pe:
+    input:
+        reads = "Results/deconseq/{prefix}-pe_clean.fasta"
+        
+    output:
+        kraken2 = "Results/kraken2/{prefix}-pe",
+        classifieds="Results/kraken2/{prefix}-pe.fasta"
+
+    threads: config["kraken2_pe"]["cpu"]
+ 
+    params:
+        tool="/pasteur/projets/specific/PGP_Work/Scripts/Kraken2/BUILD/kraken2",
+        DB="/pasteur/projets/specific/PGP_Work/Scripts/Kraken2/DB/",
+        renamed=lambda wildcards,output: output.classifieds.replace('.fasta', '')
+
+    log:
+        "Results/kraken2/{prefix}-pe.log"
+    
+    run:
+         shell("time {params.tool} --threads {threads} -db {params.DB} --unclassified-out {params.renamed}.unclassified --classified-out {output.classifieds} --output {output.kraken2} --report {params.renamed}.report  --report-zero-counts {input.reads} &> {log} ")
+

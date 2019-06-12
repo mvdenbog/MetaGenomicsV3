@@ -1,0 +1,40 @@
+import os
+
+
+UNIT_TO_SAMPLE_PE = {
+    ID: sample for sample, units in PE_samples.items()
+    for ID in units}
+
+rule link:
+    input:
+         "Results/fqcleaner/{prefix}.q{q}p{p}l{l}.fq",
+    output:
+         "Results/concat/SE/{prefix}.q{q}p{p}l{l}.fq"
+
+    params:
+        q=config["fqcleaner"]["q"], 
+        p=config["fqcleaner"]["p"], 
+        l=config["fqcleaner"]["l"],
+
+    shell: 
+        "ln {input}  {output} "
+
+
+
+rule concat_pe:
+    input:
+         forward = "Results/fqcleaner/{unit}.q{q}p{p}l{l}_1.fq",
+         reverse = "Results/fqcleaner/{unit}.q{q}p{p}l{l}_2.fq",
+         sgl = "Results/fqcleaner/{unit}.q{q}p{p}l{l}_sgl.fq"
+    output:
+         "Results/concat/PE/{unit}.q{q}p{p}l{l}.fq"
+
+    params:
+        q=config["fqcleaner"]["q"], 
+        p=config["fqcleaner"]["p"], 
+        l=config["fqcleaner"]["l"],
+        ID=lambda wildcards: UNIT_TO_SAMPLE_PE[wildcards.unit]
+
+    shell: 
+        "cat {input.forward} {input.reverse} {input.sgl} > {output} "
+

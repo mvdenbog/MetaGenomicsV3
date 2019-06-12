@@ -1,0 +1,55 @@
+__default__ :
+    mem : "100G"
+    cpu : 1
+    partition: "cibu"
+    qos: "cibu"
+    job-name : "{rule}"
+
+fastqc:
+    cpu: 1
+    partition: "cibu"
+    qos: "cibu"
+
+bwa_mem:
+    cpu: 1
+    partition: "cibu"
+    qos: "cibu"
+
+kraken2_se:
+    mem: "250G"
+    cpu: 20
+    partition: "cibu"
+    qos: "cibu"
+
+kraken2_pe:
+    mem: "250G"
+    cpu: 20
+    partition: "cibu"
+    qos: "cibu"
+
+kraken2taxo_se:
+    mem: "100G"
+    cpu: 1
+    partition: "cibu"
+    qos: "cibu"
+
+kraken2taxo_pe:
+    mem: "100G"
+    cpu: 1
+    partition: "cibu"
+    qos: "cibu"
+
+assembly_se:
+    mem: "100G"
+    cpu: 2
+    partition: "clcbio"
+    qos: "clcbio"
+
+assembly_pe:
+    mem: "100G"
+    cpu: 2
+    partition: "clcbio"
+    qos: "clcbio"
+
+
+

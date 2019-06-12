@@ -1,0 +1,39 @@
+import os
+
+rule kraken2taxo_se:
+    input:
+        kraken2output = "Results/kraken2/{prefix}-se"
+        
+    output:
+        taxo = "Results/kraken2taxo/{prefix}-se.taxo",
+
+    params:
+        DB="/pasteur/gaia/projets/p01/PGP_Work/Scripts/PgpSlurmBlast2Taxo/taxonomy.db",
+        renamed=lambda wildcards,output: output.taxo.replace('.taxo', ''),
+        tool="/pasteur/homes/mathias/Pf8/Experiments/Sqlite/from_many_taxids_to_taxo"
+
+    log:
+        "Results/kraken2taxo/{prefix}-se.log"
+    
+    run:
+         shell("{params.tool} {params.DB} {input.kraken2output} {output} {params.renamed}.notaxo &> {log} ")
+
+
+rule kraken2taxo_pe:
+    input:
+        kraken2output = "Results/kraken2/{prefix}-pe"
+        
+    output:
+        taxo ="Results/kraken2taxo/{prefix}-pe.taxo"
+
+    params:
+        DB="/pasteur/gaia/projets/p01/PGP_Work/Scripts/PgpSlurmBlast2Taxo/taxonomy.db",
+        renamed=lambda wildcards,output: output.taxo.replace('.taxo', ''),
+        tool="/pasteur/homes/mathias/Pf8/Experiments/Sqlite/from_many_taxids_to_taxo"
+
+    log:
+        "Results/kraken2taxo/{prefix}-pe.log"
+    
+    run:
+         shell("{params.tool} {params.DB} {input.kraken2output} {output.taxo} {params.renamed}.notaxo &> {log} ")
+

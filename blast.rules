@@ -1,0 +1,122 @@
+import os
+
+rule blast_se:
+    input:
+        targetseqs = "Results/assembly/{prefix}-se.{group}-{seqtype}.fasta"
+        
+    output:
+        blast = "Results/blast/{prefix}-se.{group}-{seqtype}.blastn",
+
+    params:
+        unassembled_reads_fasta=lambda wildcards,input: input.targetseqs.replace('contigs', 'unassembled_reads'),
+        unassembled_reads_blastn=lambda wildcards,output: output.blast.replace('contigs', 'unassembled_reads'),
+        tool="perl /pasteur/projets/specific/PGP_Work/Scripts/PgpSlurmBlastall/pgp_slurm_blastall2 ",
+        BEV={config["blast"]["BEV"]},
+        NTDB={config["blast"]["NTDB"]} 
+
+    log:
+        "Results/blast/{prefix}-{group}-{seqtype}.se.log"
+    
+    shell:
+         """
+         set +eou pipefail;
+         if [[ -s {input.targetseqs} ]];then
+         {params.tool} -i {input.targetseqs} -o {output.blast} -v 1 -b 1 -m 8 -F F -e {params.BEV} -d {params.NTDB} -p blastn;
+         else
+         touch {output.blast}
+         fi
+         """
+
+rule blast_pe:
+    input:
+        targetseqs = "Results/assembly/{prefix}-pe.{group}-{seqtype}.fasta"
+        
+    output:
+        blast ="Results/blast/{prefix}-pe.{group}-{seqtype}.blastn"
+
+    params:
+        unassembled_reads_fasta=lambda wildcards,input: input.targetseqs.replace('contigs', 'unassembled_reads'),
+        unassembled_reads_blastn=lambda wildcards,output: output.blast.replace('contigs', 'unassembled_reads'),
+        tool="perl /pasteur/projets/specific/PGP_Work/Scripts/PgpSlurmBlastall/pgp_slurm_blastall2 ",
+        BEV={config["blast"]["BEV"]},
+        NTDB={config["blast"]["NTDB"]} 
+
+
+    log:
+        "Results/blast/{prefix}-{group}-{seqtype}.pe.log"
+    
+    shell:
+         """
+         set +eou pipefail;
+         if [[ -s {input.targetseqs} ]]; then
+         {params.tool} -i {input.targetseqs} -o {output.blast} -v 1 -b 1 -m 8 -F F -e {params.BEV} -d {params.NTDB} -p blastn;
+         else
+         touch {output.blast} ;
+         fi;
+         """
+
+rule failure_recovery_blast2fasta:
+    input:
+        targetseqs = "Results/assembly/{prefix}-{type}.{group}-{seqtype}.fasta"
+    output:
+        fasta = "Results/blast/{prefix}-{type}.{group}-{seqtype}.noblastn.fasta"
+    params:
+        input_blastn_report=lambda wildcards,output: output.fasta.replace('.noblastn.fasta', '.blastn'),
+    shell:
+        """
+        set +eou pipefail;
+        sh /pasteur/gaia/projets/p01/PGP_Work/Scripts/repriseEchecBlast.sh -f {input.targetseqs} -r {params.input_blastn_report} -o {output} ;
+        """
+
+rule blastx_se:
+    input:
+        targetseqs = "Results/blast/{prefix}-se.{group}-{seqtype}.noblastn.fasta"
+        
+    output:
+        blast = "Results/blast/{prefix}-se.{group}-{seqtype}.blastx",
+
+    params:
+        unassembled_reads_fasta=lambda wildcards,input: input.targetseqs.replace('contigs', 'unassembled_reads'),
+        unassembled_reads_blastx=lambda wildcards,output: output.blast.replace('contigs', 'unassembled_reads'),
+        tool="perl /pasteur/projets/specific/PGP_Work/Scripts/PgpSlurmBlastall/pgp_slurm_blastall2 ",
+        UNIPROTDB={config["blast"]["UNIPROTDB"]} 
+
+    log:
+        "Results/blast/{prefix}-{group}-{seqtype}.se.blastx.log"
+    
+    shell:
+         """
+         set +eou pipefail;
+         if [[ -s {input.targetseqs} ]];then
+         {params.tool} -i {input.targetseqs} -o {output.blast} -v 1 -b 1 -m 8 -F F -e 1000 -d {params.UNIPROTDB} -p blastx;
+         else
+         touch {output.blast}
+         fi
+         """
+
+
+rule blastx_pe:
+    input:
+        targetseqs = "Results/blast/{prefix}-pe.{group}-{seqtype}.noblastn.fasta"
+        
+    output:
+        blast = "Results/blast/{prefix}-pe.{group}-{seqtype}.blastx",
+
+    params:
+        unassembled_reads_fasta=lambda wildcards,input: input.targetseqs.replace('contigs', 'unassembled_reads'),
+        unassembled_reads_blastx=lambda wildcards,output: output.blast.replace('contigs', 'unassembled_reads'),
+        tool="perl /pasteur/projets/specific/PGP_Work/Scripts/PgpSlurmBlastall/pgp_slurm_blastall2 ",
+        UNIPROTDB={config["blast"]["UNIPROTDB"]} 
+
+    log:
+        "Results/blast/{prefix}-{group}-{seqtype}.pe.blastx.log"
+    
+    shell:
+         """
+         set +eou pipefail;
+         if [[ -s {input.targetseqs} ]];then
+         {params.tool} -i {input.targetseqs} -o {output.blast} -v 1 -b 1 -m 8 -F F -e 1000 -d {params.UNIPROTDB} -p blastx;
+         else
+         touch {output.blast}
+         fi
+         """

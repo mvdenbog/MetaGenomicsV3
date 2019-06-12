@@ -1,0 +1,43 @@
+# coding: utf-8
+import os
+
+
+rule deconseq_se:
+    input:
+        reads = "Results/fastq2fasta/{prefix}-se.fasta"
+        
+    output:
+        "Results/deconseq/{prefix}-se_clean.fasta"
+
+    params:
+        renamed=lambda wildcards,input: input.reads.replace('-se.fasta', '')
+        
+    log:
+        "Results/deconseq/{prefix}-se.deconseq_log"
+    
+    shell:
+         """
+         {config[deconseq][tool]} -f {input} -d human,putois -r viral,bacteria -c 95 -i 94 -g 1 -n 100
+         mv {params.renamed}-se_clean.fasta {params.renamed}-se_cont.fasta {params.renamed}-se_deconseq.log Results/deconseq/
+         """
+
+
+rule deconseq_pe:
+    input:
+        reads = "Results/fastq2fasta/{prefix}-pe.fasta"
+        
+    output:
+        "Results/deconseq/{prefix}-pe_clean.fasta"
+
+    params:
+        renamed=lambda wildcards,input: input.reads.replace('-pe.fasta', '')
+        
+    log:
+        "Results/deconseq/{prefix}.deconseq_log"
+    
+    shell:
+         """
+         {config[deconseq][tool]} -f {input} -d human,putois -r viral,bacteria -c 95 -i 94 -g 1 -n 100 
+          mv {params.renamed}-pe_clean.fasta {params.renamed}-pe_cont.fasta {params.renamed}-pe_deconseq.log Results/deconseq/
+         """
+

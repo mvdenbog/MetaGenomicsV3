@@ -1,0 +1,27 @@
+# coding: utf-8
+import os
+
+
+"""
+Rules for analysing fastq files with FastQC.
+"""
+
+
+rule fastqc:
+    input:
+        reads="{prefix}.fastq"
+        
+    output:
+        "Results/fastqc/{prefix}_fastqc.zip"
+        
+    threads: config["fastqc"]["cpu"]
+    
+    log:
+        "Results/fastqc/{prefix}_fastqc.stderr"
+    
+    shell:
+        """
+        {config[Fastqc][prelude]}
+        {config[Fastqc][tool]} -q -t {threads} {input.reads} -o Results/fastqc 2> {log}
+        """
+

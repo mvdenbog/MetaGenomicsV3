@@ -1,0 +1,29 @@
+
+def get_files_se(wildcards):
+    unit = wildcards.unit
+    q = config["fqcleaner"]["q"]
+    p = config["fqcleaner"]["p"]
+    l = config["fqcleaner"]["l"]
+    return ["Results/reformat/" + unit + ".q" + str(q) + "p" + str(p) + "l" + str(l) + "-se" + ".fq"]
+
+def get_files_pe(wildcards):
+    unit = wildcards.unit
+    q = config["fqcleaner"]["q"]
+    p = config["fqcleaner"]["p"]
+    l = config["fqcleaner"]["l"]
+    return ["Results/reformat/" + unit + ".q" + str(q) + "p" + str(p) + "l" + str(l) + "-pe" + ".fq"]
+
+
+rule rename_se:
+    input: get_files_se
+    output:
+        "Results/renamed/{unit}-se.fq"
+    run:
+        shell("cp {input[0]} {output}")
+
+rule rename_pe:
+    input: get_files_pe
+    output:
+        "Results/renamed/{unit}-pe.fq"
+    run:
+        shell("cp {input[0]} {output}")

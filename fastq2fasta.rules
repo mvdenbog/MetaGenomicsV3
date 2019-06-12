@@ -1,0 +1,16 @@
+import os
+
+
+rule fastq2fasta:
+    input:
+        reads="Results/renamed/{prefix}.fq"
+        
+    output:
+        "Results/fastq2fasta/{prefix}.fasta"
+        
+    shell:
+        """
+        echo prefix is {prefix}
+        {config[fastq2fasta]} {input.reads} {output}
+        """
+

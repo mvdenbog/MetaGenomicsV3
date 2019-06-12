@@ -1,0 +1,9 @@
+
+rule best_score:
+    input: 
+        "Results/blast/{unit}-{type}.{group}-{seqtype}.{blasttype}"
+    output:
+        "Results/bestscore/{unit}-{type}.{group}-{seqtype}.{blasttype}.bs"
+    run:
+        shell("perl /pasteur/gaia/projets/p01/PGP_Work/Scripts/best_score_v4.pl -i {input} -o {output}")
+

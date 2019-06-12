@@ -1,0 +1,16 @@
+import os
+
+
+rule bam2fastq:
+    input:
+        reads="{prefix}.bam"
+        
+    output:
+        "{prefix}.fastq"
+        
+    shell:
+        """
+        echo prefix is {prefix}
+        {config[bam2fastq]} {input.reads} -o {output}
+        """
+
