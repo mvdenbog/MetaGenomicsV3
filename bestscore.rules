@@ -4,6 +4,8 @@ rule best_score:
         "Results/blast/{unit}-{type}.{group}-{seqtype}.{blasttype}"
     output:
         "Results/bestscore/{unit}-{type}.{group}-{seqtype}.{blasttype}.bs"
+    params:
+        tool=config["bestscore"]["tool"]
     run:
-        shell("perl /pasteur/gaia/projets/p01/PGP_Work/Scripts/best_score_v4.pl -i {input} -o {output}")
+        shell("{params.tool} -i {input} -o {output}")
 

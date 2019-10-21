@@ -7,10 +7,13 @@ rule miseqreformat_se:
         
     output:
         renamed = "Results/reformat/{prefix}-se.fq"
-       
+
+    params:
+        tool=config["miseqreformat"]["tool"]       
+
     shell:
         """
-        perl /pasteur/projets/specific/PGP_Work/Scripts/miseq_reformat_fq.pl {input} {output.renamed}
+        {params.tool} {input} {output.renamed}
         """
 
 
@@ -21,8 +24,11 @@ rule miseqreformat_pe:
     output:
         renamed = "Results/reformat/{prefix}-pe.fq"
        
+    params:
+        tool=config["miseqreformat"]["tool"]       
+
     shell:
         """
-        perl /pasteur/projets/specific/PGP_Work/Scripts/miseq_reformat_fq.pl {input} {output.renamed}
+        {params.tool} {input} {output.renamed}
         """
 

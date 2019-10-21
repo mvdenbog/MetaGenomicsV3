@@ -72,7 +72,8 @@ include: "splittaxo.rules"
 include: "assembly.rules"
 include: "blast.rules"
 include: "bestscore.rules"
-
+include: "taxo.rules"
+include: "summarize.rules"
 
 
 
@@ -119,5 +120,11 @@ rule all:
 
         expand("Results/bestscore/{unit}-se.{group}-{seqtype}.{blasttype}.bs", unit = SE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
         expand("Results/bestscore/{unit}-pe.{group}-{seqtype}.{blasttype}.bs", unit = PE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
+
+        expand("Results/taxo/{unit}-se.{group}-{seqtype}.{blasttype}.bs.taxo", unit = SE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
+        expand("Results/taxo/{unit}-pe.{group}-{seqtype}.{blasttype}.bs.taxo", unit = PE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
+
+        expand("Results/summary/{unit}-se.{group}.{blasttype}.bs.taxo.xls", unit = SE_reads, group=GROUPS, blasttype=BLASTTYPES),
+        expand("Results/summary/{unit}-pe.{group}.{blasttype}.bs.taxo.xls", unit = PE_reads, group=GROUPS, blasttype=BLASTTYPES),
 
 

@@ -8,8 +8,14 @@ Fastqc:
   prelude: "module load fastqc"
   tool: "fastqc"
 
+miseqreformat:
+  tool: "perl Scripts/miseq_reformat_fq.pl"
+
 deconseq:
   tool: "sh /pasteur/projets/specific/PGP_Work/Scripts/DeconSeq/pgpDeconseq_slurm.sh"
+
+bestscore:
+  tool: "perl Scripts/best_score_v4.pl"
 
 bwa: "bwa"
 
@@ -59,7 +65,12 @@ fqcleaner:
    l: 30
    p: 70
 
+summarize:
+   tool: "sh Scripts/summarize.sh "
+
 blast:
    BEV: "10e-3"
    NTDB: "/pasteur/services/policy01/banques/prod/rel/nt/current/blast2/2.2.26/nt"
    UNIPROTDB: "/pasteur/services/policy01/banques/prod/rel/uniprot/current/blast2/2.2.26/uniprot"
+
+

@@ -12,7 +12,7 @@ rule splittaxo_se:
     params:
         DB="/pasteur/gaia/projets/p01/PGP_Work/Scripts/PgpSlurmBlast2Taxo/taxonomy.db",
         renamed=lambda wildcards,output: output.taxo.replace('.{group}.fasta', ''),
-        tool="splittaxo.sh",
+        tool="Scripts/splittaxo.sh",
         ref_fasta="Results/deconseq/{prefix}-se_clean.fasta",
 
     log:
@@ -36,7 +36,7 @@ rule splittaxo_pe:
     params:
         DB="/pasteur/gaia/projets/p01/PGP_Work/Scripts/PgpSlurmBlast2Taxo/taxonomy.db",
         renamed=lambda wildcards,output: output.taxo.replace('.fasta', ''),
-        tool="splittaxo.sh",
+        tool="Scripts/splittaxo.sh",
         ref_fasta="Results/deconseq/{prefix}-pe_clean.fasta",
 
     log:
