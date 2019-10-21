@@ -1,0 +1,37 @@
+import os
+
+rule summary:
+    input: 
+        virus_unass="Results/taxo/{unit}.Virus-unassembled_reads.{blasttype}.bs.taxo",
+        virus_contig="Results/taxo/{unit}.Virus-contigs.{blasttype}.bs.taxo",
+        bacteria_unass="Results/taxo/{unit}.Bacteria-unassembled_reads.{blasttype}.bs.taxo",
+        bacteria_contig="Results/taxo/{unit}.Bacteria-contigs.{blasttype}.bs.taxo",
+        fungi_unass="Results/taxo/{unit}.Fungi-unassembled_reads.{blasttype}.bs.taxo",
+        fungi_contig="Results/taxo/{unit}.Fungi-contigs.{blasttype}.bs.taxo",
+        other_unass="Results/taxo/{unit}.Other-unassembled_reads.{blasttype}.bs.taxo",
+        other_contig="Results/taxo/{unit}.Other-contigs.{blasttype}.bs.taxo",
+        unclass_unass="Results/taxo/{unit}.Unclassifieds-unassembled_reads.{blasttype}.bs.taxo",
+        unclass_contig="Results/taxo/{unit}.Unclassifieds-contigs.{blasttype}.bs.taxo",
+        eukaryota_unass="Results/taxo/{unit}.Eukaryota-unassembled_reads.{blasttype}.bs.taxo",
+        eukaryota_contig="Results/taxo/{unit}.Eukaryota-contigs.{blasttype}.bs.taxo"
+    output:
+        virus="Results/summary/{unit}.Virus.{blasttype}.bs.taxo.xls",
+        bacteria="Results/summary/{unit}.Bacteria.{blasttype}.bs.taxo.xls",
+        fungi="Results/summary/{unit}.Fungi.{blasttype}.bs.taxo.xls",
+        other="Results/summary/{unit}.Other.{blasttype}.bs.taxo.xls",
+        unclass="Results/summary/{unit}.Unclassifieds.{blasttype}.bs.taxo.xls",
+        eukaryota="Results/summary/{unit}.Eukaryota.{blasttype}.bs.taxo.xls"
+
+    params:
+        tool=config["summarize"]["tool"]
+
+    shell:
+        """
+         set +e pipefail
+         {params.tool} Virus {input.virus_unass} {input.virus_contig} {input.bacteria_contig} {input.bacteria_unass} {input.fungi_contig} {input.fungi_unass} {input.unclass_contig} {input.unclass_unass} {input.eukaryota_contig} {input.eukaryota_unass} {input.other_unass} {input.other_contig}    > {output.virus}
+         {params.tool} Bacteria {input.virus_unass} {input.virus_contig} {input.bacteria_contig} {input.bacteria_unass} {input.fungi_contig} {input.fungi_unass} {input.unclass_contig} {input.unclass_unass} {input.eukaryota_contig} {input.eukaryota_unass}  {input.other_unass} {input.other_contig}    > {output.bacteria}
+         {params.tool} Fungi {input.virus_unass} {input.virus_contig} {input.bacteria_contig} {input.bacteria_unass} {input.fungi_contig} {input.fungi_unass} {input.unclass_contig} {input.unclass_unass} {input.eukaryota_contig} {input.eukaryota_unass}  {input.other_unass} {input.other_contig}    > {output.fungi}
+         {params.tool} Other {input.virus_unass} {input.virus_contig} {input.bacteria_contig} {input.bacteria_unass} {input.fungi_contig} {input.fungi_unass} {input.unclass_contig} {input.unclass_unass} {input.eukaryota_contig} {input.eukaryota_unass}  {input.other_unass} {input.other_contig}    > {output.other}
+         {params.tool} Unclassified {input.virus_unass} {input.virus_contig} {input.bacteria_contig} {input.bacteria_unass} {input.fungi_contig} {input.fungi_unass} {input.unclass_contig} {input.unclass_unass} {input.eukaryota_contig} {input.eukaryota_unass}  {input.other_unass} {input.other_contig}    > {output.unclass}
+         {params.tool} Eukaryota {input.virus_unass} {input.virus_contig} {input.bacteria_contig} {input.bacteria_unass} {input.fungi_contig} {input.fungi_unass} {input.unclass_contig} {input.unclass_unass} {input.eukaryota_contig} {input.eukaryota_unass}  {input.other_unass} {input.other_contig}    > {output.eukaryota}
+        """

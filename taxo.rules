@@ -1,0 +1,20 @@
+
+rule taxo:
+    input: 
+        "Results/bestscore/{unit}-{type}.{group}-{seqtype}.{blasttype}.bs"
+    output:
+        taxo="Results/taxo/{unit}-{type}.{group}-{seqtype}.{blasttype}.bs.taxo",
+        notaxo="Results/taxo/{unit}-{type}.{group}-{seqtype}.{blasttype}.bs.notaxo"
+    shell:
+         """
+         # set -e -o pipefail;
+         module load golden openmpi taxoptimizer ptools/0.99d
+         # echo taxoptimizer -i {input} -o {output.taxo} -f {output.notaxo}
+         set +eou pipefail;
+         if [[ -s {input} ]]; then
+	 mtaxoptimizer -i {input} -o {output.taxo} -f {output.notaxo}
+         else
+         touch {output.taxo} {output.notaxo}
+         fi
+         """
+
