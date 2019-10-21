@@ -11,3 +11,4 @@ virtualenv myvirtualenv
 . ./myvirtualenv/bin/activate
 pip install snakemake
 ./snakemake -v
+
