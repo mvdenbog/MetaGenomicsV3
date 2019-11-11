@@ -27,8 +27,8 @@ rule fqcleaner_se:
 
 rule fqcleaner_pe:
     input:
-         forward = "{unit}.R1.fastq",
-         reverse = "{unit}.R2.fastq"
+         forward = "{unit}_R1.fastq",
+         reverse = "{unit}_R2.fastq"
     output:
          forward = "Results/fqcleaner/{unit}.q{q}p{p}l{l}_1.fq",
          reverse = "Results/fqcleaner/{unit}.q{q}p{p}l{l}_2.fq",

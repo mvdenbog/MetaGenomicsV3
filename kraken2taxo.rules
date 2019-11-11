@@ -10,7 +10,7 @@ rule kraken2taxo_se:
     params:
         DB="/pasteur/gaia/projets/p01/PGP_Work/Scripts/PgpSlurmBlast2Taxo/taxonomy.db",
         renamed=lambda wildcards,output: output.taxo.replace('.taxo', ''),
-        tool="/pasteur/homes/mathias/Pf8/Experiments/Sqlite/from_many_taxids_to_taxo"
+        tool="/pasteur/gaia/projets/p01/PGP_Work/Scripts/from_many_taxids_to_taxo"
 
     log:
         "Results/kraken2taxo/{prefix}-se.log"
@@ -29,7 +29,7 @@ rule kraken2taxo_pe:
     params:
         DB="/pasteur/gaia/projets/p01/PGP_Work/Scripts/PgpSlurmBlast2Taxo/taxonomy.db",
         renamed=lambda wildcards,output: output.taxo.replace('.taxo', ''),
-        tool="/pasteur/homes/mathias/Pf8/Experiments/Sqlite/from_many_taxids_to_taxo"
+        tool="/pasteur/gaia/projets/p01/PGP_Work/Scripts/from_many_taxids_to_taxo"
 
     log:
         "Results/kraken2taxo/{prefix}-pe.log"

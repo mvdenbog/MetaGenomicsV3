@@ -34,7 +34,8 @@ for line in open(config["reads"], "r"):
         R2=line.strip().split()[2]
         plateform[ID]=line.strip().split()[3]
         Type_flowcell[ID]=line.strip().split()[-1]
-        prefix=(R1.split("/")[-1]).replace('.fastq.gz','').replace('.fq.gz', '').replace('.R1', '').replace('.R', '').replace('.bam', '')
+        prefix=(R1.split("/")[-1]).replace('.fastq.gz','').replace('.fq.gz', '').replace('.R1', '').replace('_R1', '').replace('.R', '').replace('.bam', '').replace('.fastq','')
+        print("Adding " + R1)
         all_reads.append(R1)
         
         all_samples.setdefault(ID, [])
@@ -44,6 +45,7 @@ for line in open(config["reads"], "r"):
             PE_samples.setdefault(ID, [])
             PE_samples[ID].append(prefix)
             PE_reads[prefix]=[R1, R2]
+            print("Adding " + R2)
             all_reads.append(R2)
         else:
             SE_samples.setdefault(ID, [])
@@ -53,7 +55,7 @@ for line in open(config["reads"], "r"):
 
 PREFIXES=list()
 for i in all_reads:
-    PREFIXES.append(os.path.basename(i).replace('.fq.gz','').replace('.fastq.gz','').replace('.bam',''))
+    PREFIXES.append(os.path.basename(i).replace('.fq.gz','').replace('.fastq.gz','').replace('.bam','').replace('.fastq',''))
 
 
 localrules: deconseq, blast_pe, blast_se, blast, blastx_se, blastx_pe
@@ -76,53 +78,49 @@ include: "taxo.rules"
 include: "summarize.rules"
 
 
-
-
-
-
-
 rule all:
     # raw
     input:
     # QC
+        expand("{prefix}.fastq", prefix = PREFIXES),
         expand("Results/fastqc/{prefix}_fastqc.zip", prefix = PREFIXES),
-        expand("Results/fqcleaner/{unit}.q{q}p{p}l{l}.fq", unit = SE_reads, q=config["fqcleaner"]["q"],p=config["fqcleaner"]["p"], l=config["fqcleaner"]["l"]),
-        expand("Results/fqcleaner/{unit}.q{q}p{p}l{l}_1.fq", unit = PE_reads, q=config["fqcleaner"]["q"],p=config["fqcleaner"]["p"], l=config["fqcleaner"]["l"]),
-    # CONCAT PE reads:
-        expand("Results/concat/PE/{unit}.q{q}p{p}l{l}.fq", unit = PE_reads, q=config["fqcleaner"]["q"],p=config["fqcleaner"]["p"], l=config["fqcleaner"]["l"]),
-        expand("Results/concat/SE/{unit}.q{q}p{p}l{l}.fq", unit = SE_reads, q=config["fqcleaner"]["q"],p=config["fqcleaner"]["p"], l=config["fqcleaner"]["l"]),
-        expand("Results/reformat/{unit}.q{q}p{p}l{l}-se.fq", unit = SE_reads, q=config["fqcleaner"]["q"],p=config["fqcleaner"]["p"], l=config["fqcleaner"]["l"]),
-        expand("Results/reformat/{unit}.q{q}p{p}l{l}-pe.fq", unit = PE_reads , q=config["fqcleaner"]["q"],p=config["fqcleaner"]["p"], l=config["fqcleaner"]["l"]),
+    #     expand("Results/fqcleaner/{unit}.q{q}p{p}l{l}.fq", unit = SE_reads, q=config["fqcleaner"]["q"],p=config["fqcleaner"]["p"], l=config["fqcleaner"]["l"]),
+    #     expand("Results/fqcleaner/{unit}.q{q}p{p}l{l}_1.fq", unit = PE_reads, q=config["fqcleaner"]["q"],p=config["fqcleaner"]["p"], l=config["fqcleaner"]["l"]),
+    # # CONCAT PE reads:
+    #     expand("Results/concat/PE/{unit}.q{q}p{p}l{l}.fq", unit = PE_reads, q=config["fqcleaner"]["q"],p=config["fqcleaner"]["p"], l=config["fqcleaner"]["l"]),
+    #     expand("Results/concat/SE/{unit}.q{q}p{p}l{l}.fq", unit = SE_reads, q=config["fqcleaner"]["q"],p=config["fqcleaner"]["p"], l=config["fqcleaner"]["l"]),
+    #     expand("Results/reformat/{unit}.q{q}p{p}l{l}-se.fq", unit = SE_reads, q=config["fqcleaner"]["q"],p=config["fqcleaner"]["p"], l=config["fqcleaner"]["l"]),
+    #     expand("Results/reformat/{unit}.q{q}p{p}l{l}-pe.fq", unit = PE_reads , q=config["fqcleaner"]["q"],p=config["fqcleaner"]["p"], l=config["fqcleaner"]["l"]),
 
-        expand("Results/renamed/{unit}-se.fq", unit = SE_reads),
-        expand("Results/renamed/{unit}-pe.fq", unit = PE_reads),
+    #     expand("Results/renamed/{unit}-se.fq", unit = SE_reads),
+    #     expand("Results/renamed/{unit}-pe.fq", unit = PE_reads),
 
-        expand("Results/fastq2fasta/{unit}-se.fasta", unit = SE_reads),
-        expand("Results/fastq2fasta/{unit}-pe.fasta", unit = PE_reads),
+    #     expand("Results/fastq2fasta/{unit}-se.fasta", unit = SE_reads),
+    #     expand("Results/fastq2fasta/{unit}-pe.fasta", unit = PE_reads),
 
-        expand("Results/deconseq/{unit}-se_clean.fasta", unit = SE_reads),
-        expand("Results/deconseq/{unit}-pe_clean.fasta", unit = PE_reads),
+    #     expand("Results/deconseq/{unit}-se_clean.fasta", unit = SE_reads),
+    #     expand("Results/deconseq/{unit}-pe_clean.fasta", unit = PE_reads),
 
-        expand("Results/kraken2/{unit}-se.fasta", unit = SE_reads),
-        expand("Results/kraken2/{unit}-pe.fasta", unit = PE_reads),
+    #     expand("Results/kraken2/{unit}-se.fasta", unit = SE_reads),
+    #     expand("Results/kraken2/{unit}-pe.fasta", unit = PE_reads),
 
-        expand("Results/kraken2taxo/{unit}-se.taxo", unit = SE_reads),
-        expand("Results/kraken2taxo/{unit}-pe.taxo", unit = PE_reads),
+    #     expand("Results/kraken2taxo/{unit}-se.taxo", unit = SE_reads),
+    #     expand("Results/kraken2taxo/{unit}-pe.taxo", unit = PE_reads),
 
-        expand("Results/splittaxo/{unit}-se.taxo.{group}.fasta", unit = SE_reads,group=GROUPS),
-        expand("Results/splittaxo/{unit}-pe.taxo.{group}.fasta", unit = PE_reads,group=GROUPS),
+    #     expand("Results/splittaxo/{unit}-se.taxo.{group}.fasta", unit = SE_reads,group=GROUPS),
+    #     expand("Results/splittaxo/{unit}-pe.taxo.{group}.fasta", unit = PE_reads,group=GROUPS),
 
-        expand("Results/assembly/{unit}-se.{group}-contigs.fasta", unit = SE_reads, group=GROUPS),
-        expand("Results/assembly/{unit}-pe.{group}-contigs.fasta", unit = PE_reads, group=GROUPS),
+    #     expand("Results/assembly/{unit}-se.{group}-contigs.fasta", unit = SE_reads, group=GROUPS),
+    #     expand("Results/assembly/{unit}-pe.{group}-contigs.fasta", unit = PE_reads, group=GROUPS),
 
-        expand("Results/blast/{unit}-se.{group}-{seqtype}.{blasttype}", unit = SE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
-        expand("Results/blast/{unit}-pe.{group}-{seqtype}.{blasttype}", unit = PE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
+    #     expand("Results/blast/{unit}-se.{group}-{seqtype}.{blasttype}", unit = SE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
+    #     expand("Results/blast/{unit}-pe.{group}-{seqtype}.{blasttype}", unit = PE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
 
-        expand("Results/bestscore/{unit}-se.{group}-{seqtype}.{blasttype}.bs", unit = SE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
-        expand("Results/bestscore/{unit}-pe.{group}-{seqtype}.{blasttype}.bs", unit = PE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
+    #     expand("Results/bestscore/{unit}-se.{group}-{seqtype}.{blasttype}.bs", unit = SE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
+    #     expand("Results/bestscore/{unit}-pe.{group}-{seqtype}.{blasttype}.bs", unit = PE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
 
-        expand("Results/taxo/{unit}-se.{group}-{seqtype}.{blasttype}.bs.taxo", unit = SE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
-        expand("Results/taxo/{unit}-pe.{group}-{seqtype}.{blasttype}.bs.taxo", unit = PE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
+    #     expand("Results/taxo/{unit}-se.{group}-{seqtype}.{blasttype}.bs.taxo", unit = SE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
+    #     expand("Results/taxo/{unit}-pe.{group}-{seqtype}.{blasttype}.bs.taxo", unit = PE_reads, group=GROUPS, seqtype=SEQTYPES, blasttype=BLASTTYPES),
 
         expand("Results/summary/{unit}-se.{group}.{blasttype}.bs.taxo.xls", unit = SE_reads, group=GROUPS, blasttype=BLASTTYPES),
         expand("Results/summary/{unit}-pe.{group}.{blasttype}.bs.taxo.xls", unit = PE_reads, group=GROUPS, blasttype=BLASTTYPES),
